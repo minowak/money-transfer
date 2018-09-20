@@ -69,23 +69,6 @@ public class UsersControllerTest {
     }
 
     @Test
-    public void shouldUpdateAccount() {
-        // Given
-        Account accountBefore = new Account("1234", Sets.newHashSet());
-        Account accountAfter = new Account("5678", Sets.newHashSet());
-        User user = new User(1L, "testName", "testSurname", Sets.newHashSet(accountBefore));
-
-        // When
-        usersService.add(user);
-        usersController.updateAccount(accountAfter, user.getId(), accountBefore.getNumber());
-
-        // Then
-        assertEquals(1, usersService.get().size());
-        assertEquals(1, usersService.get().iterator().next().getAccounts().size());
-        assertTrue(usersService.get().iterator().next().getAccounts().contains(accountAfter));
-    }
-
-    @Test
     public void shouldDeleteAccounts() {
         // Given
         Account account = new Account("1234", Sets.newHashSet());

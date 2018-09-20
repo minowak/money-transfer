@@ -1,5 +1,6 @@
 package com.minowak.api;
 
+import com.google.common.collect.Lists;
 import com.minowak.model.Account;
 import com.minowak.model.Balance;
 import com.minowak.model.Transfer;
@@ -14,7 +15,6 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 // TODO sort, fields, target ?
 // TODO account export to different controller
@@ -34,25 +34,24 @@ public class UsersController {
     @Path("{id}/account/{number}")
     @Produces(MediaType.APPLICATION_JSON)
     public Account getAccount(@PathParam("id") Long id, @PathParam("number") String number) {
-        return usersService.get(id).getAccounts().stream()
-                .filter(a -> a.getNumber().equals(number))
-                .findFirst()
-                .orElse(null);
+        for (Account account : usersService.get(id).getAccounts()) {
+            if (account.getNumber().equals(number)) {
+                return account;
+            }
+        }
+        return null;
     }
 
     @GET
     @Path("{id}/account/{number}/balance")
     @Produces(MediaType.APPLICATION_JSON)
     public Balance getBalance(@PathParam("id") Long id, @PathParam("number") String number) {
-        List<Transfer> accountTransfers = transferService.get().stream()
-                .filter(t -> t.getInputNumber().equals(number) || t.getOutputNumber().equals(number))
-                .collect(Collectors.toList());
+        List<Transfer> accountTransfers = Lists.newArrayList();
         BigInteger balanceValue = BigInteger.ZERO;
-
-        for (Transfer transfer : accountTransfers) {
+        for (Transfer transfer : transferService.get()) {
             if (transfer.getInputNumber().equals(number)) {
                 balanceValue = balanceValue.subtract(transfer.getValue());
-            } else {
+            } else if (transfer.getOutputNumber().equals(number)) {
                 balanceValue = balanceValue.add(transfer.getValue());
             }
         }
@@ -72,26 +71,6 @@ public class UsersController {
         return updated
                 ? Response.status(Response.Status.CREATED).build()
                 : Response.status(Response.Status.CONFLICT).build();
-    }
-
-    @PUT
-    @Path("{id}/account/{number}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateAccount(Account account, @PathParam("id") Long id, @PathParam("number") String number) {
-        User user = usersService.get(id);
-        Account accountBefore = user.getAccounts().stream()
-                .filter(a -> a.getNumber().equals(number))
-                .findFirst()
-                .orElse(null);
-
-        if (accountBefore == null) {
-            return Response.status(Response.Status.CONFLICT).build();
-        }
-
-        user.getAccounts().remove(accountBefore);
-        user.getAccounts().add(account);
-
-        return Response.status(Response.Status.CREATED).build();
     }
 
     @DELETE
