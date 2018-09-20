@@ -1,17 +1,18 @@
 package com.minowak.model;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigInteger;
 
 @Data
 @Getter
 @Setter
+@AllArgsConstructor
 @NoArgsConstructor
+@Builder(toBuilder = true)
+@EqualsAndHashCode(of = { "id" })
 public class Transfer {
+    private Long id;
     private String inputNumber;
     private String outputNumber;
     private BigInteger value;

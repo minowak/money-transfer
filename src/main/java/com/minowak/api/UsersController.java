@@ -10,11 +10,10 @@ import javax.ws.rs.core.Response;
 import java.util.Collection;
 import java.util.Set;
 
+// TODO sort, fields, target ?
 @Path("/user")
 public class UsersController {
     private final UsersService usersService = UsersService.getInstance();
-
-    // TODO update account
 
     @GET
     @Path("{id}/account")

@@ -23,7 +23,10 @@ public final class UsersService implements PersistenceService<Long, User> {
 
     @Override
     public User get(Long id) {
-        return users.stream().filter(u -> u.getId().equals(id)).findFirst().orElse(null);
+        return users.stream()
+                .filter(u -> u.getId().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
@@ -33,14 +36,20 @@ public final class UsersService implements PersistenceService<Long, User> {
 
     @Override
     public boolean add(User element) {
-        Optional<User> existingUser = users.stream().filter(u -> u.getId().equals(element.getId())).findAny();
-        return !existingUser.isPresent() && users.add(element.toBuilder().id(getMaxId() + 1).build());
+        Optional<User> existingUser = users.stream()
+                .filter(u -> u.getId().equals(element.getId()))
+                .findAny();
+        User newElement = element.getId() == null ? element.toBuilder().id(getMaxId() + 1).build()
+                : element;
+        return !existingUser.isPresent() && users.add(newElement);
     }
 
     // TODO also remove accounts
     @Override
     public boolean delete(Long id) {
-        Optional<User> existingUser = users.stream().filter(u -> u.getId().equals(id)).findFirst();
+        Optional<User> existingUser = users.stream()
+                .filter(u -> u.getId().equals(id))
+                .findFirst();
         return existingUser.isPresent() && users.remove(existingUser.get());
     }
 
@@ -52,7 +61,9 @@ public final class UsersService implements PersistenceService<Long, User> {
 
     @Override
     public boolean update(Long id, User elementAfter) {
-        Optional<User> existingUser = users.stream().filter(u -> u.getId().equals(id)).findFirst();
+        Optional<User> existingUser = users.stream()
+                .filter(u -> u.getId().equals(id))
+                .findFirst();
         if (existingUser.isPresent()) {
             users.remove(existingUser.get());
             users.add(elementAfter);

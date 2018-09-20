@@ -7,7 +7,6 @@ import com.minowak.service.UsersService;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.math.BigInteger;
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
@@ -27,7 +26,7 @@ public class UsersControllerTest {
     @Test
     public void shouldGetAccounts() {
         // Given
-        Account account = new Account("1234", BigInteger.ONE, Sets.newHashSet());
+        Account account = new Account("1234", Sets.newHashSet());
         User user = new User(1L, "testName", "testSurname", Sets.newHashSet(account));
 
         // When
@@ -42,7 +41,7 @@ public class UsersControllerTest {
     @Test
     public void shouldGetAccount() {
         // Given
-        Account account = new Account("1234", BigInteger.ONE, Sets.newHashSet());
+        Account account = new Account("1234", Sets.newHashSet());
         User user = new User(1L, "testName", "testSurname", Sets.newHashSet(account));
 
         // When
@@ -56,7 +55,7 @@ public class UsersControllerTest {
     @Test
     public void shouldCreateAccount() {
         // Given
-        Account account = new Account("1234", BigInteger.ONE, Sets.newHashSet());
+        Account account = new Account("1234", Sets.newHashSet());
         User user = new User(1L, "testName", "testSurname", Sets.newHashSet());
 
         // When
@@ -72,8 +71,8 @@ public class UsersControllerTest {
     @Test
     public void shouldUpdateAccount() {
         // Given
-        Account accountBefore = new Account("1234", BigInteger.ONE, Sets.newHashSet());
-        Account accountAfter = new Account("5678", BigInteger.ONE, Sets.newHashSet());
+        Account accountBefore = new Account("1234", Sets.newHashSet());
+        Account accountAfter = new Account("5678", Sets.newHashSet());
         User user = new User(1L, "testName", "testSurname", Sets.newHashSet(accountBefore));
 
         // When
@@ -89,7 +88,7 @@ public class UsersControllerTest {
     @Test
     public void shouldDeleteAccounts() {
         // Given
-        Account account = new Account("1234", BigInteger.ONE, Sets.newHashSet());
+        Account account = new Account("1234", Sets.newHashSet());
         User user = new User(1L, "testName", "testSurname", Sets.newHashSet(account));
 
         // When
