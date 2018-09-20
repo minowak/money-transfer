@@ -9,7 +9,9 @@ import com.minowak.service.UsersService;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Path("/user")
 public class UsersController {
@@ -19,7 +21,7 @@ public class UsersController {
     @GET
     @Path("{id}/account")
     @Produces(MediaType.APPLICATION_JSON)
-    public Iterable<Account> getAccounts(@PathParam("id") Long id) {
+    public Collection<Account> getAccounts(@PathParam("id") Long id) {
         Set<Account> userAccounts = Sets.newHashSet();
         for (Account account : accountsService.get()) {
             if (account.getUserId().equals(id)) {
@@ -32,17 +34,19 @@ public class UsersController {
     @DELETE
     @Path("{id}/account")
     public Response deleteAccounts(@PathParam("id") Long id) {
+        Set<Account> toDelete = Sets.newHashSet();
         for (Account account : accountsService.get()) {
             if (account.getUserId().equals(id)) {
-                accountsService.delete(account.getNumber());
+                toDelete.add(account);
             }
         }
+        toDelete.forEach(account -> accountsService.delete(account.getNumber()));
         return Response.status(Response.Status.GONE).build();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Iterable<User> getUsers() {
+    public Collection<User> getUsers() {
         return usersService.get();
     }
 
@@ -71,15 +75,20 @@ public class UsersController {
 
     @DELETE
     public Response deleteAllUsers() {
-        usersService.delete();
-        return Response.status(Response.Status.GONE).build();
+        return (usersService.delete() && accountsService.delete()) ? Response.status(Response.Status.GONE).build()
+                : Response.serverError().build();
     }
 
     @DELETE
     @Path("{id}")
     public Response deleteUser(@PathParam("id") Long id) {
-        usersService.delete(id);
-        return Response.status(Response.Status.GONE).build();
+        if (usersService.delete(id)) {
+            Set<Account> toDelete = accountsService.get().stream().filter(a -> a.getUserId().equals(id))
+                    .collect(Collectors.toSet());
+            toDelete.forEach(a -> accountsService.delete(a.getNumber()));
+            return Response.status(Response.Status.GONE).build();
+        }
+        return Response.serverError().build();
     }
 
 }

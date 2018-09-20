@@ -5,7 +5,7 @@ import com.minowak.model.User;
 
 import java.util.*;
 
-public final class UsersService implements CrudService<Long, User> {
+public final class UsersService implements PersistenceService<Long, User> {
     private static volatile UsersService INSTANCE = null;
 
     public static UsersService getInstance() {
@@ -37,21 +37,7 @@ public final class UsersService implements CrudService<Long, User> {
         return !existingUser.isPresent() && users.add(element.toBuilder().id(getMaxId() + 1).build());
     }
 
-    @Override
-    public boolean add(Collection<User> elements) {
-        for (User element : elements) {
-            if (users.stream().anyMatch(u -> u.getId().equals(element.getId()))) {
-                return false;
-            }
-        }
-
-        for (User element : elements) {
-            users.add(element.toBuilder().id(getMaxId() + 1).build());
-        }
-
-        return true;
-    }
-
+    // TODO also remove accounts
     @Override
     public boolean delete(Long id) {
         Optional<User> existingUser = users.stream().filter(u -> u.getId().equals(id)).findFirst();

@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-public class AccountsService implements CrudService<String, Account> {
+public class AccountsService implements PersistenceService<String, Account> {
     private static volatile AccountsService INSTANCE = null;
 
     public static AccountsService getInstance() {
@@ -38,16 +38,6 @@ public class AccountsService implements CrudService<String, Account> {
     public boolean add(Account element) {
         Optional<Account> existingAccount = accounts.stream().filter(a -> a.getNumber().equals(element.getNumber())).findAny();
         return !existingAccount.isPresent() && accounts.add(element);
-    }
-
-    @Override
-    public boolean add(Collection<Account> elements) {
-        for (Account account : accounts) {
-            if (accounts.stream().anyMatch(a -> a.getNumber().equals(account.getNumber()))) {
-                return false;
-            }
-        }
-        return accounts.addAll(elements);
     }
 
     @Override
