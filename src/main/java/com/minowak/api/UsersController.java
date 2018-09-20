@@ -1,16 +1,44 @@
 package com.minowak.api;
 
+import com.google.common.collect.Sets;
+import com.minowak.model.Account;
 import com.minowak.model.User;
+import com.minowak.service.AccountsService;
 import com.minowak.service.UsersService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Set;
 
-@Path("/users")
+@Path("/user")
 public class UsersController {
-    // TODO autoservice?
     private final UsersService usersService = UsersService.getInstance();
+    private final AccountsService accountsService = AccountsService.getInstance();
+
+    @GET
+    @Path("{id}/account")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Iterable<Account> getAccounts(@PathParam("id") Long id) {
+        Set<Account> userAccounts = Sets.newHashSet();
+        for (Account account : accountsService.get()) {
+            if (account.getUserId().equals(id)) {
+                userAccounts.add(account);
+            }
+        }
+        return userAccounts;
+    }
+
+    @DELETE
+    @Path("{id}/account")
+    public Response deleteAccounts(@PathParam("id") Long id) {
+        for (Account account : accountsService.get()) {
+            if (account.getUserId().equals(id)) {
+                accountsService.delete(account.getNumber());
+            }
+        }
+        return Response.status(Response.Status.GONE).build();
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

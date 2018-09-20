@@ -7,7 +7,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/user/account")
+@Path("/account")
 public class AccountsController {
     private final AccountsService accountsService = AccountsService.getInstance();
     @GET
