@@ -1,8 +1,8 @@
 package com.minowak.api;
 
+import com.google.common.collect.Sets;
 import com.minowak.model.Account;
 import com.minowak.model.User;
-import com.minowak.service.AccountsService;
 import com.minowak.service.UsersService;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,59 +15,97 @@ import static org.junit.Assert.assertTrue;
 
 public class UsersControllerTest {
     private final UsersService usersService = UsersService.getInstance();
-    private final AccountsService accountsService = AccountsService.getInstance();
 
     private UsersController usersController;
 
     @Before
     public void setUp() {
         usersService.delete();
-        accountsService.delete();
-
         usersController = new UsersController();
     }
 
     @Test
     public void shouldGetAccounts() {
         // Given
-        User user = new User(1L, "testName", "testSurname");
-        Account account = new Account("1234", BigInteger.ONE, user.getId());
+        Account account = new Account("1234", BigInteger.ONE, Sets.newHashSet());
+        User user = new User(1L, "testName", "testSurname", Sets.newHashSet(account));
 
         // When
         usersService.add(user);
-        accountsService.add(account);
         Collection<Account> accounts = usersController.getAccounts(user.getId());
 
         // Then
-        assertEquals(accounts.size(), 1);
+        assertEquals(1, accounts.size());
         assertTrue(accounts.contains(account));
+    }
+
+    @Test
+    public void shouldGetAccount() {
+        // Given
+        Account account = new Account("1234", BigInteger.ONE, Sets.newHashSet());
+        User user = new User(1L, "testName", "testSurname", Sets.newHashSet(account));
+
+        // When
+        usersService.add(user);
+        Account accountResponse = usersController.getAccount(user.getId(), account.getNumber());
+
+        // Then
+        assertEquals(account, accountResponse);
+    }
+
+    @Test
+    public void shouldCreateAccount() {
+        // Given
+        Account account = new Account("1234", BigInteger.ONE, Sets.newHashSet());
+        User user = new User(1L, "testName", "testSurname", Sets.newHashSet());
+
+        // When
+        usersService.add(user);
+        usersController.createAccount(account, user.getId());
+
+        // Then
+        assertEquals(1, usersService.get().size());
+        assertEquals(1, usersService.get().iterator().next().getAccounts().size());
+        assertTrue(usersService.get().iterator().next().getAccounts().contains(account));
+    }
+
+    @Test
+    public void shouldUpdateAccount() {
+        // Given
+        Account accountBefore = new Account("1234", BigInteger.ONE, Sets.newHashSet());
+        Account accountAfter = new Account("5678", BigInteger.ONE, Sets.newHashSet());
+        User user = new User(1L, "testName", "testSurname", Sets.newHashSet(accountBefore));
+
+        // When
+        usersService.add(user);
+        usersController.updateAccount(accountAfter, user.getId(), accountBefore.getNumber());
+
+        // Then
+        assertEquals(1, usersService.get().size());
+        assertEquals(1, usersService.get().iterator().next().getAccounts().size());
+        assertTrue(usersService.get().iterator().next().getAccounts().contains(accountAfter));
     }
 
     @Test
     public void shouldDeleteAccounts() {
         // Given
-        User user1 = new User(1L, "testName1", "testSurname1");
-        User user2 = new User(2L, "testName2", "testSurname2");
-        Account account1 = new Account("1234", BigInteger.ONE, user1.getId());
-        Account account2 = new Account("5678", BigInteger.ONE, user2.getId());
+        Account account = new Account("1234", BigInteger.ONE, Sets.newHashSet());
+        User user = new User(1L, "testName", "testSurname", Sets.newHashSet(account));
 
         // When
-        usersService.add(user1);
-        usersService.add(user2);
-        accountsService.add(account1);
-        accountsService.add(account2);
-        usersController.deleteAccounts(user1.getId());
+        usersService.add(user);
+        usersController.deleteAccounts(user.getId());
 
         // Then
-        assertEquals(accountsService.get().size(), 1);
-        assertTrue(accountsService.get().contains(account2));
+        assertEquals(1, usersService.get().size());
+        assertEquals(0, usersService.get().iterator().next().getAccounts().size());
     }
 
     @Test
     public void shouldGetUsers() {
         // Given
-        User user1 = new User(1L, "testName1", "testSurname1");
-        User user2 = new User(2L, "testName2", "testSurname2");
+        User user1 = new User(1L, "testName1", "testSurname1", Sets.newHashSet());
+        User user2 = new User(2L, "testName2", "testSurname2", Sets.newHashSet());
 
         // When
         usersService.add(user1);
@@ -75,7 +113,7 @@ public class UsersControllerTest {
         Collection<User> users = usersController.getUsers();
 
         // Then
-        assertEquals(users.size(), 2);
+        assertEquals(2, users.size());
         assertTrue(users.contains(user1));
         assertTrue(users.contains(user2));
     }
@@ -83,32 +121,32 @@ public class UsersControllerTest {
     @Test
     public void shouldGetUser() {
         // Given
-        User user = new User(1L, "testName", "testSurname");
+        User user = new User(1L, "testName", "testSurname", Sets.newHashSet());
 
         // When
         usersService.add(user);
         User resultUser = usersController.getUser(user.getId());
 
         // Then
-        assertEquals(resultUser, user);
+        assertEquals(user, resultUser);
     }
 
     @Test
     public void shouldCreateUser() {
         // Given
-        User user = new User(1L, "testName", "testSurname");
+        User user = new User(1L, "testName", "testSurname", Sets.newHashSet());
 
         // When
         usersController.createUser(user);
 
         // Then
-        assertEquals(usersService.get(user.getId()), user);
+        assertEquals(user, usersService.get(user.getId()));
     }
 
     @Test
     public void shouldUpdateUser() {
         // Given
-        User user = new User(1L, "testName", "testSurname");
+        User user = new User(1L, "testName", "testSurname", Sets.newHashSet());
         User updatedUser = user.toBuilder().name("updatedName").build();
 
         // When
@@ -116,43 +154,37 @@ public class UsersControllerTest {
         usersController.updateUser(updatedUser, user.getId());
 
         // Then
-        assertEquals(usersService.get(user.getId()).getName(), updatedUser.getName());
+        assertEquals(updatedUser.getName(), usersService.get(user.getId()).getName());
     }
 
     @Test
     public void shouldDeleteAllUsers() {
         // Given
-        User user1 = new User(1L, "testName1", "testSurname1");
-        User user2 = new User(2L, "testName2", "testSurname2");
-        Account account = new Account("1234", BigInteger.ONE, user1.getId());
+        User user1 = new User(1L, "testName1", "testSurname1", Sets.newHashSet());
+        User user2 = new User(2L, "testName2", "testSurname2", Sets.newHashSet());
 
         // When
         usersService.add(user1);
         usersService.add(user2);
-        accountsService.add(account);
         usersController.deleteAllUsers();
 
         // Then
-        assertEquals(usersService.get().size(), 0);
-        assertEquals(accountsService.get().size(), 0);
+        assertEquals(0, usersService.get().size());
     }
 
     @Test
     public void shouldDeleteUser() {
         // Given
-        User user1 = new User(1L, "testName1", "testSurname1");
-        User user2 = new User(2L, "testName2", "testSurname2");
-        Account account = new Account("1234", BigInteger.ONE, user1.getId());
+        User user1 = new User(1L, "testName1", "testSurname1", Sets.newHashSet());
+        User user2 = new User(2L, "testName2", "testSurname2", Sets.newHashSet());
 
         // When
         usersService.add(user1);
         usersService.add(user2);
-        accountsService.add(account);
         usersController.deleteUser(user1.getId());
 
         // Then
-        assertEquals(usersService.get().size(), 1);
-        assertEquals(accountsService.get().size(), 0);
+        assertEquals(1, usersService.get().size());
         assertTrue(usersService.get().contains(user2));
     }
 }

@@ -3,17 +3,16 @@ package com.minowak.model;
 import lombok.*;
 
 import java.math.BigInteger;
+import java.util.Set;
 
-@Data
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(of = { "number" })
 @Builder(toBuilder = true)
 public class Account {
     private String number;
     private BigInteger balance;
-    private Long userId;
-
-    // TODO history of operations
+    private Set<Transfer> transfers;
 }

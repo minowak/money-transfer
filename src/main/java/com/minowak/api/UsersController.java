@@ -1,9 +1,7 @@
 package com.minowak.api;
 
-import com.google.common.collect.Sets;
 import com.minowak.model.Account;
 import com.minowak.model.User;
-import com.minowak.service.AccountsService;
 import com.minowak.service.UsersService;
 
 import javax.ws.rs.*;
@@ -11,36 +9,68 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Path("/user")
 public class UsersController {
     private final UsersService usersService = UsersService.getInstance();
-    private final AccountsService accountsService = AccountsService.getInstance();
+
+    // TODO update account
 
     @GET
     @Path("{id}/account")
     @Produces(MediaType.APPLICATION_JSON)
     public Collection<Account> getAccounts(@PathParam("id") Long id) {
-        Set<Account> userAccounts = Sets.newHashSet();
-        for (Account account : accountsService.get()) {
-            if (account.getUserId().equals(id)) {
-                userAccounts.add(account);
-            }
+        return usersService.get(id).getAccounts();
+    }
+
+    @GET
+    @Path("{id}/account/{number}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Account getAccount(@PathParam("id") Long id, @PathParam("number") String number) {
+        return usersService.get(id).getAccounts().stream()
+                .filter(a -> a.getNumber().equals(number))
+                .findFirst()
+                .orElse(null);
+    }
+
+    @POST
+    @Path("{id}/account")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response createAccount(Account account, @PathParam("id") Long id) {
+        User user = usersService.get(id);
+        Set<Account> accounts = user.getAccounts();
+        accounts.add(account);
+
+        boolean updated = usersService.update(id, user.toBuilder().accounts(accounts).build());
+        return updated
+                ? Response.status(Response.Status.CREATED).build()
+                : Response.status(Response.Status.CONFLICT).build();
+    }
+
+    @PUT
+    @Path("{id}/account/{number}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateAccount(Account account, @PathParam("id") Long id, @PathParam("number") String number) {
+        User user = usersService.get(id);
+        Account accountBefore = user.getAccounts().stream()
+                .filter(a -> a.getNumber().equals(number))
+                .findFirst()
+                .orElse(null);
+
+        if (accountBefore == null) {
+            return Response.status(Response.Status.CONFLICT).build();
         }
-        return userAccounts;
+
+        user.getAccounts().remove(accountBefore);
+        user.getAccounts().add(account);
+
+        return Response.status(Response.Status.CREATED).build();
     }
 
     @DELETE
     @Path("{id}/account")
     public Response deleteAccounts(@PathParam("id") Long id) {
-        Set<Account> toDelete = Sets.newHashSet();
-        for (Account account : accountsService.get()) {
-            if (account.getUserId().equals(id)) {
-                toDelete.add(account);
-            }
-        }
-        toDelete.forEach(account -> accountsService.delete(account.getNumber()));
+        usersService.get(id).getAccounts().clear();
         return Response.status(Response.Status.GONE).build();
     }
 
@@ -75,20 +105,14 @@ public class UsersController {
 
     @DELETE
     public Response deleteAllUsers() {
-        return (usersService.delete() && accountsService.delete()) ? Response.status(Response.Status.GONE).build()
+        return usersService.delete() ? Response.status(Response.Status.GONE).build()
                 : Response.serverError().build();
     }
 
     @DELETE
     @Path("{id}")
     public Response deleteUser(@PathParam("id") Long id) {
-        if (usersService.delete(id)) {
-            Set<Account> toDelete = accountsService.get().stream().filter(a -> a.getUserId().equals(id))
-                    .collect(Collectors.toSet());
-            toDelete.forEach(a -> accountsService.delete(a.getNumber()));
-            return Response.status(Response.Status.GONE).build();
-        }
-        return Response.serverError().build();
+        return usersService.delete(id) ? Response.status(Response.Status.GONE).build() : Response.serverError().build();
     }
 
 }
