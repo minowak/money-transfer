@@ -5,9 +5,9 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Unit test for simple MoneyTransferApp.
+ * Unit test for simple ApplicationConfig.
  */
-public class MoneyTransferAppTest
+public class ApplicationConfigTest
     extends TestCase
 {
     /**
@@ -15,7 +15,7 @@ public class MoneyTransferAppTest
      *
      * @param testName name of the test case
      */
-    public MoneyTransferAppTest(String testName )
+    public ApplicationConfigTest(String testName )
     {
         super( testName );
     }
@@ -25,7 +25,7 @@ public class MoneyTransferAppTest
      */
     public static Test suite()
     {
-        return new TestSuite( MoneyTransferAppTest.class );
+        return new TestSuite( ApplicationConfigTest.class );
     }
 
     /**

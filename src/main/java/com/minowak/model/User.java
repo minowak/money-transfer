@@ -5,11 +5,11 @@ import lombok.*;
 @Data
 @Getter
 @Setter
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder(toBuilder = true)
 public class User {
     private Long id;
-    @NonNull
     private String name;
-    @NonNull
     private String surname;
 }

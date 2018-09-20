@@ -3,10 +3,7 @@ package com.minowak.service;
 import com.google.common.collect.Sets;
 import com.minowak.model.User;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public final class UsersService implements CrudService<Long, User> {
     private static volatile UsersService INSTANCE = null;
@@ -37,7 +34,7 @@ public final class UsersService implements CrudService<Long, User> {
     @Override
     public boolean add(User element) {
         Optional<User> existingUser = users.stream().filter(u -> u.getId().equals(element.getId())).findAny();
-        return !existingUser.isPresent() && users.add(element);
+        return !existingUser.isPresent() && users.add(element.toBuilder().id(getMaxId() + 1).build());
     }
 
     @Override
@@ -45,10 +42,14 @@ public final class UsersService implements CrudService<Long, User> {
         for (User element : elements) {
             if (users.stream().anyMatch(u -> u.getId().equals(element.getId()))) {
                 return false;
-
             }
         }
-        return users.addAll(elements);
+
+        for (User element : elements) {
+            users.add(element.toBuilder().id(getMaxId() + 1).build());
+        }
+
+        return true;
     }
 
     @Override
@@ -72,5 +73,10 @@ public final class UsersService implements CrudService<Long, User> {
             return true;
         }
         return false;
+    }
+
+    private synchronized Long getMaxId() {
+        Optional<User> existingUser = users.stream().max(Comparator.comparing(User::getId));
+        return existingUser.map(User::getId).orElse(0L);
     }
 }
