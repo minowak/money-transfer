@@ -34,6 +34,7 @@ public class AccountsService implements PersistenceService<String, Account> {
         return accounts;
     }
 
+    // TODO check if user exist
     @Override
     public boolean add(Account element) {
         Optional<Account> existingAccount = accounts.stream().filter(a -> a.getNumber().equals(element.getNumber())).findAny();

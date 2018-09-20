@@ -6,13 +6,14 @@ import com.minowak.service.AccountsService;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Collection;
 
 @Path("/account")
 public class AccountsController {
     private final AccountsService accountsService = AccountsService.getInstance();
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Iterable<Account> getAccounts() {
+    public Collection<Account> getAccounts() {
         return accountsService.get();
     }
 
