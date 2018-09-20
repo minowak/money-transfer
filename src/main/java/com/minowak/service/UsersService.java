@@ -1,12 +1,13 @@
 package com.minowak.service;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.minowak.model.User;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 
-public final class UsersService implements CrudService<User> {
+public final class UsersService implements CrudService<Long, User> {
     private static volatile UsersService INSTANCE = null;
 
     public static UsersService getInstance() {
@@ -20,36 +21,55 @@ public final class UsersService implements CrudService<User> {
         return INSTANCE;
     }
 
-    private List<User> users = Lists.newArrayList();
+    private Set<User> users = Sets.newHashSet();
 
+    @Override
     public User get(Long id) {
-        return users.get(id.intValue());
+        return users.stream().filter(u -> u.getId().equals(id)).findFirst().orElse(null);
     }
 
-    public List<User> get() {
+    @Override
+    public Collection<User> get() {
         return users;
     }
 
+    @Override
     public boolean add(User element) {
-        // TODO error codes
-        Optional<Long> existingElementId = users.stream().map(User::getId).filter(id -> id.equals(element.getId())).findAny();
-        return !existingElementId.isPresent() && users.add(element);
+        Optional<User> existingUser = users.stream().filter(u -> u.getId().equals(element.getId())).findAny();
+        return !existingUser.isPresent() && users.add(element);
     }
 
-    public boolean add(List<User> elements) {
-        // TODO check if ids exists
+    @Override
+    public boolean add(Collection<User> elements) {
+        for (User element : elements) {
+            if (users.stream().anyMatch(u -> u.getId().equals(element.getId()))) {
+                return false;
+
+            }
+        }
         return users.addAll(elements);
     }
 
-    public void delete(Long id) {
-        users.remove(id.intValue());
+    @Override
+    public boolean delete(Long id) {
+        Optional<User> existingUser = users.stream().filter(u -> u.getId().equals(id)).findFirst();
+        return existingUser.isPresent() && users.remove(existingUser.get());
     }
 
-    public void delete() {
+    @Override
+    public boolean delete() {
         users.clear();
+        return true;
     }
 
-    public void update(Long id, User elementAfter) {
-        users.add(id.intValue(), elementAfter);
+    @Override
+    public boolean update(Long id, User elementAfter) {
+        Optional<User> existingUser = users.stream().filter(u -> u.getId().equals(id)).findFirst();
+        if (existingUser.isPresent()) {
+            users.remove(existingUser.get());
+            users.add(elementAfter);
+            return true;
+        }
+        return false;
     }
 }
