@@ -1,19 +1,27 @@
 package com.minowak.api;
 
 import com.minowak.model.Account;
+import com.minowak.model.Balance;
+import com.minowak.model.Transfer;
 import com.minowak.model.User;
+import com.minowak.service.TransferService;
 import com.minowak.service.UsersService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.math.BigInteger;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 // TODO sort, fields, target ?
+// TODO account export to different controller
 @Path("/user")
 public class UsersController {
     private final UsersService usersService = UsersService.getInstance();
+    private final TransferService transferService = TransferService.getInstance();
 
     @GET
     @Path("{id}/account")
@@ -30,6 +38,26 @@ public class UsersController {
                 .filter(a -> a.getNumber().equals(number))
                 .findFirst()
                 .orElse(null);
+    }
+
+    @GET
+    @Path("{id}/account/{number}/balance")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Balance getBalance(@PathParam("id") Long id, @PathParam("number") String number) {
+        List<Transfer> accountTransfers = transferService.get().stream()
+                .filter(t -> t.getInputNumber().equals(number) || t.getOutputNumber().equals(number))
+                .collect(Collectors.toList());
+        BigInteger balanceValue = BigInteger.ZERO;
+
+        for (Transfer transfer : accountTransfers) {
+            if (transfer.getInputNumber().equals(number)) {
+                balanceValue = balanceValue.subtract(transfer.getValue());
+            } else {
+                balanceValue = balanceValue.add(transfer.getValue());
+            }
+        }
+
+        return new Balance(balanceValue, accountTransfers);
     }
 
     @POST
