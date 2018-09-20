@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import com.minowak.model.Account;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ public class AccountsService implements CrudService<String, Account> {
         return INSTANCE;
     }
 
-    private Set<Account> accounts = Sets.newHashSet();
+    private Set<Account> accounts = Collections.synchronizedSet(Sets.newHashSet());
 
     @Override
     public Account get(String number) {

@@ -53,4 +53,5 @@ public class UsersController {
         usersService.delete(id);
         return Response.status(Response.Status.GONE).build();
     }
+
 }

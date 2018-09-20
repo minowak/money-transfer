@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import com.minowak.model.User;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ public final class UsersService implements CrudService<Long, User> {
         return INSTANCE;
     }
 
-    private Set<User> users = Sets.newHashSet();
+    private Set<User> users = Collections.synchronizedSet(Sets.newHashSet());
 
     @Override
     public User get(Long id) {
