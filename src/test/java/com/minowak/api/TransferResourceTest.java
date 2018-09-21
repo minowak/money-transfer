@@ -11,16 +11,16 @@ import java.util.Collection;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class TransferControllerTest {
+public class TransferResourceTest {
     private final TransferService transferService = TransferService.getInstance();
 
-    private TransferController transferController;
+    private TransferResource transferResource;
 
     @Before
     public void setUp() {
         transferService.delete();
 
-        transferController = new TransferController();
+        transferResource = new TransferResource();
     }
 
     @Test
@@ -32,7 +32,7 @@ public class TransferControllerTest {
         // When
         transferService.add(transfer1);
         transferService.add(transfer2);
-        Collection<Transfer> transferResults = transferController.getTransfers();
+        Collection<Transfer> transferResults = transferResource.getTransfers();
 
         // Then
         assertEquals(2, transferResults.size());
@@ -47,7 +47,7 @@ public class TransferControllerTest {
 
         // When
         transferService.add(transfer);
-        Transfer transferResult = transferController.getTransfer(transfer.getId());
+        Transfer transferResult = transferResource.getTransfer(transfer.getId());
 
         // Then
         assertEquals(transfer, transferResult);
@@ -59,7 +59,7 @@ public class TransferControllerTest {
         Transfer transfer = new Transfer(1L, "1234", "5678", BigInteger.valueOf(100));
 
         // When
-        transferController.addTransfer(transfer);
+        transferResource.addTransfer(transfer);
         Transfer transferResult = transferService.get(transfer.getId());
 
         // Then

@@ -9,7 +9,7 @@ import javax.ws.rs.core.Response;
 import java.util.Collection;
 
 @Path("/transfer")
-public class TransferController {
+public class TransferResource {
     private final TransferService transferService = TransferService.getInstance();
 
     @GET
