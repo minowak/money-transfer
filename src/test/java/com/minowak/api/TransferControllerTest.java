@@ -1,0 +1,68 @@
+package com.minowak.api;
+
+import com.minowak.model.Transfer;
+import com.minowak.service.TransferService;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.math.BigInteger;
+import java.util.Collection;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class TransferControllerTest {
+    private final TransferService transferService = TransferService.getInstance();
+
+    private TransferController transferController;
+
+    @Before
+    public void setUp() {
+        transferService.delete();
+
+        transferController = new TransferController();
+    }
+
+    @Test
+    public void shouldGetTransfers() {
+        // Given
+        Transfer transfer1 = new Transfer(1L, "1234", "5678", BigInteger.valueOf(100));
+        Transfer transfer2 = new Transfer(2L, "1234", "5678", BigInteger.valueOf(10));
+
+        // When
+        transferService.add(transfer1);
+        transferService.add(transfer2);
+        Collection<Transfer> transferResults = transferController.getTransfers();
+
+        // Then
+        assertEquals(2, transferResults.size());
+        assertTrue(transferResults.contains(transfer1));
+        assertTrue(transferResults.contains(transfer2));
+    }
+
+    @Test
+    public void shouldGetTransfer() {
+        // Given
+        Transfer transfer = new Transfer(1L, "1234", "5678", BigInteger.valueOf(100));
+
+        // When
+        transferService.add(transfer);
+        Transfer transferResult = transferController.getTransfer(transfer.getId());
+
+        // Then
+        assertEquals(transfer, transferResult);
+    }
+
+    @Test
+    public void shouldAddTransfer() {
+        // Given
+        Transfer transfer = new Transfer(1L, "1234", "5678", BigInteger.valueOf(100));
+
+        // When
+        transferController.addTransfer(transfer);
+        Transfer transferResult = transferService.get(transfer.getId());
+
+        // Then
+        assertEquals(transfer, transferResult);
+    }
+}

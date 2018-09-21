@@ -45,13 +45,13 @@ public class UsersController {
     @GET
     @Path("{id}/account/{number}/balance")
     @Produces(MediaType.APPLICATION_JSON)
-    public Balance getBalance(@PathParam("id") Long id, @PathParam("number") String number) {
+    public Balance calculateBalance(@PathParam("id") Long id, @PathParam("number") String number) {
         List<Transfer> accountTransfers = Lists.newArrayList();
         BigInteger balanceValue = BigInteger.ZERO;
         for (Transfer transfer : transferService.get()) {
-            if (transfer.getInputNumber().equals(number)) {
+            if (number.equals(transfer.getInputNumber())) {
                 balanceValue = balanceValue.subtract(transfer.getValue());
-            } else if (transfer.getOutputNumber().equals(number)) {
+            } else if (number.equals(transfer.getOutputNumber())) {
                 balanceValue = balanceValue.add(transfer.getValue());
             }
         }

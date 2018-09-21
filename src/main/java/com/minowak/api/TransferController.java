@@ -25,6 +25,7 @@ public class TransferController {
         return transferService.get(id);
     }
 
+    // TODO check if accounts exist
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addTransfer(Transfer transfer) {

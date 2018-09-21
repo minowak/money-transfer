@@ -5,6 +5,7 @@ import com.minowak.model.User;
 
 import java.util.*;
 
+// TODO https://stackoverflow.com/questions/16216759/dependency-injection-with-jersey-2-0
 public final class UsersService implements PersistenceService<Long, User> {
     private static volatile UsersService INSTANCE = null;
 
@@ -44,7 +45,6 @@ public final class UsersService implements PersistenceService<Long, User> {
         return !existingUser.isPresent() && users.add(newElement);
     }
 
-    // TODO also remove accounts
     @Override
     public boolean delete(Long id) {
         Optional<User> existingUser = users.stream()
