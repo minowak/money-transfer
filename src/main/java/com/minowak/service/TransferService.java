@@ -3,22 +3,11 @@ package com.minowak.service;
 import com.google.common.collect.Sets;
 import com.minowak.model.Transfer;
 
+import javax.inject.Singleton;
 import java.util.*;
 
+@Singleton
 public class TransferService implements PersistenceService<Long, Transfer> {
-    private static volatile TransferService INSTANCE = null;
-
-    public static TransferService getInstance() {
-        if (INSTANCE == null) {
-            synchronized (TransferService.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new TransferService();
-                }
-            }
-        }
-        return INSTANCE;
-    }
-
     private Set<Transfer> transfers = Collections.synchronizedSet(Sets.newHashSet());
 
     @Override

@@ -8,6 +8,8 @@ import com.minowak.model.User;
 import com.minowak.service.TransferService;
 import com.minowak.service.UsersService;
 
+import javax.annotation.ManagedBean;
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -16,10 +18,17 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+@ManagedBean
 @Path("/user/{id}/account")
 public class UsersAccountsResource {
-    private final UsersService usersService = UsersService.getInstance();
-    private final TransferService transferService = TransferService.getInstance();
+    private UsersService usersService;
+    private TransferService transferService;
+
+    @Inject
+    UsersAccountsResource(UsersService usersService, TransferService transferService) {
+        this.usersService = usersService;
+        this.transferService = transferService;
+    }
 
     @GET
     @Path("{id}/account")

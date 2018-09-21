@@ -7,7 +7,7 @@ import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
-public class AppServer {
+public class ApplicationServer {
     private static final int DEFAULT_PORT = 8080;
 
     public static void main(String[] args) throws Exception {
@@ -18,7 +18,7 @@ public class AppServer {
 
     private static Server configureServer() {
 
-        ResourceConfig resourceConfig = new ResourceConfig();
+        ResourceConfig resourceConfig = new ApplicationResourceConfig();
         resourceConfig.packages("com.minowak.api");
         resourceConfig.register(JacksonFeature.class);
 

@@ -2,7 +2,6 @@ package com.minowak.api;
 
 import com.google.common.collect.Sets;
 import com.minowak.model.User;
-import com.minowak.service.TransferService;
 import com.minowak.service.UsersService;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,15 +12,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class UsersResourceTest {
-    private final UsersService usersService = UsersService.getInstance();
-    private final TransferService transferService = TransferService.getInstance();
+    private UsersService usersService;
 
     private UsersResource usersResource;
 
     @Before
     public void setUp() {
-        usersService.delete();
-        usersResource = new UsersResource();
+        usersService = new UsersService();
+        usersResource = new UsersResource(usersService);
     }
 
     @Test

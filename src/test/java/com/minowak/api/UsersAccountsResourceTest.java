@@ -17,15 +17,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class UsersAccountsResourceTest {
-    private final UsersService usersService = UsersService.getInstance();
-    private final TransferService transferService = TransferService.getInstance();
+    private UsersService usersService;
+    private TransferService transferService;
 
     private UsersAccountsResource usersAccountsResource;
 
     @Before
     public void setUp() {
-        usersService.delete();
-        usersAccountsResource = new UsersAccountsResource();
+        usersService = new UsersService();
+        transferService = new TransferService();
+        usersAccountsResource = new UsersAccountsResource(usersService, transferService);
     }
 
     @Test

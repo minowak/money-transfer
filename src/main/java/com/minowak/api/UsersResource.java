@@ -3,16 +3,24 @@ package com.minowak.api;
 import com.minowak.model.User;
 import com.minowak.service.UsersService;
 
+import javax.annotation.ManagedBean;
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
 
 // TODO sort, fields, target ?
-// TODO account export to different controller
+@ManagedBean
 @Path("/user")
 public class UsersResource {
-    private final UsersService usersService = UsersService.getInstance();
+
+    private UsersService usersService;
+
+    @Inject
+    UsersResource(UsersService usersService) {
+        this.usersService = usersService;
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

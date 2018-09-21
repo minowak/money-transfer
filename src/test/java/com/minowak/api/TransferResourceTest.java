@@ -12,15 +12,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class TransferResourceTest {
-    private final TransferService transferService = TransferService.getInstance();
+    private TransferService transferService;
 
     private TransferResource transferResource;
 
     @Before
     public void setUp() {
-        transferService.delete();
-
-        transferResource = new TransferResource();
+        transferService = new TransferService();
+        transferResource = new TransferResource(transferService);
     }
 
     @Test

@@ -3,14 +3,22 @@ package com.minowak.api;
 import com.minowak.model.Transfer;
 import com.minowak.service.TransferService;
 
+import javax.annotation.ManagedBean;
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
 
+@ManagedBean
 @Path("/transfer")
 public class TransferResource {
-    private final TransferService transferService = TransferService.getInstance();
+    private TransferService transferService;
+
+    @Inject
+    TransferResource(TransferService transferService) {
+        this.transferService = transferService;
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

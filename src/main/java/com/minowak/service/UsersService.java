@@ -3,23 +3,12 @@ package com.minowak.service;
 import com.google.common.collect.Sets;
 import com.minowak.model.User;
 
+import javax.inject.Singleton;
 import java.util.*;
 
 // TODO https://stackoverflow.com/questions/16216759/dependency-injection-with-jersey-2-0
+@Singleton
 public final class UsersService implements PersistenceService<Long, User> {
-    private static volatile UsersService INSTANCE = null;
-
-    public static UsersService getInstance() {
-        if (INSTANCE == null) {
-            synchronized (UsersService.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new UsersService();
-                }
-            }
-        }
-        return INSTANCE;
-    }
-
     private Set<User> users = Collections.synchronizedSet(Sets.newHashSet());
 
     @Override
