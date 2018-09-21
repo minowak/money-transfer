@@ -1,12 +1,12 @@
 package com.minowak.api;
 
-import com.google.common.collect.Sets;
 import com.minowak.model.Account;
 import com.minowak.model.Balance;
 import com.minowak.model.Transfer;
 import com.minowak.model.User;
 import com.minowak.service.TransferService;
 import com.minowak.service.UsersService;
+import jersey.repackaged.com.google.common.collect.Sets;
 import org.junit.Before;
 import org.junit.Test;
 

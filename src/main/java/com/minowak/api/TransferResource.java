@@ -1,7 +1,10 @@
 package com.minowak.api;
 
+import com.minowak.model.Account;
 import com.minowak.model.Transfer;
+import com.minowak.model.User;
 import com.minowak.service.TransferService;
+import com.minowak.service.UsersService;
 
 import javax.annotation.ManagedBean;
 import javax.inject.Inject;
@@ -10,14 +13,17 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
 
+// TODO responses messages
 @ManagedBean
 @Path("/transfer")
 public class TransferResource {
     private TransferService transferService;
+    private UsersService usersService;
 
     @Inject
-    TransferResource(TransferService transferService) {
+    TransferResource(TransferService transferService, UsersService usersService) {
         this.transferService = transferService;
+        this.usersService = usersService;
     }
 
     @GET
@@ -37,7 +43,22 @@ public class TransferResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addTransfer(Transfer transfer) {
+        boolean inputAccoutExist = transfer.getInputNumber() == null || accountExists(transfer.getInputNumber());
+        boolean outputAccountExists = transfer.getOutputNumber() == null || accountExists(transfer.getOutputNumber());
+
+
         return transferService.add(transfer) ? Response.status(Response.Status.CREATED).build()
                 : Response.status(Response.Status.CONFLICT).build();
+    }
+
+    private boolean accountExists(String number) {
+        for (User user : usersService.get()) {
+            if (user.getAccounts().stream()
+                    .map(Account::getNumber)
+                    .anyMatch(n -> n.equals(number))) {
+                return true;
+            }
+        }
+        return false;
     }
 }

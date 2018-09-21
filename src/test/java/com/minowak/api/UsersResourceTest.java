@@ -1,8 +1,8 @@
 package com.minowak.api;
 
-import com.google.common.collect.Sets;
 import com.minowak.model.User;
 import com.minowak.service.UsersService;
+import jersey.repackaged.com.google.common.collect.Sets;
 import org.junit.Before;
 import org.junit.Test;
 

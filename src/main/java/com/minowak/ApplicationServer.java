@@ -17,7 +17,6 @@ public class ApplicationServer {
     }
 
     private static Server configureServer() {
-
         ResourceConfig resourceConfig = new ApplicationResourceConfig();
         resourceConfig.packages("com.minowak.api");
         resourceConfig.register(JacksonFeature.class);

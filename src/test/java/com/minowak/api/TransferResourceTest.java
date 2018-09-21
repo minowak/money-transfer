@@ -2,6 +2,7 @@ package com.minowak.api;
 
 import com.minowak.model.Transfer;
 import com.minowak.service.TransferService;
+import com.minowak.service.UsersService;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,13 +14,15 @@ import static org.junit.Assert.assertTrue;
 
 public class TransferResourceTest {
     private TransferService transferService;
+    private UsersService usersService;
 
     private TransferResource transferResource;
 
     @Before
     public void setUp() {
         transferService = new TransferService();
-        transferResource = new TransferResource(transferService);
+        usersService = new UsersService();
+        transferResource = new TransferResource(transferService, usersService);
     }
 
     @Test

@@ -1,7 +1,7 @@
 package com.minowak.service;
 
-import com.google.common.collect.Sets;
 import com.minowak.model.User;
+import jersey.repackaged.com.google.common.collect.Sets;
 
 import javax.inject.Singleton;
 import java.util.*;

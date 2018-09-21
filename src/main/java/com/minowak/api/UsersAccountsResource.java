@@ -1,6 +1,5 @@
 package com.minowak.api;
 
-import com.google.common.collect.Lists;
 import com.minowak.model.Account;
 import com.minowak.model.Balance;
 import com.minowak.model.Transfer;
@@ -17,6 +16,7 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @Path("/user/{id}/account")
@@ -41,29 +41,32 @@ public class UsersAccountsResource {
     @Path("{id}/account/{number}")
     @Produces(MediaType.APPLICATION_JSON)
     public Account getAccount(@PathParam("id") Long id, @PathParam("number") String number) {
-        for (Account account : usersService.get(id).getAccounts()) {
-            if (account.getNumber().equals(number)) {
-                return account;
-            }
-        }
-        return null;
+        return usersService.get(id).getAccounts().stream()
+                .filter(a -> a.getNumber().equals(number))
+                .findFirst()
+                .orElse(null);
     }
 
     @GET
     @Path("{id}/account/{number}/balance")
     @Produces(MediaType.APPLICATION_JSON)
     public Balance calculateBalance(@PathParam("id") Long id, @PathParam("number") String number) {
-        List<Transfer> accountTransfers = Lists.newArrayList();
-        BigInteger balanceValue = BigInteger.ZERO;
-        for (Transfer transfer : transferService.get()) {
-            if (number.equals(transfer.getInputNumber())) {
-                balanceValue = balanceValue.subtract(transfer.getValue());
-            } else if (number.equals(transfer.getOutputNumber())) {
-                balanceValue = balanceValue.add(transfer.getValue());
-            }
-        }
+        BigInteger outgoingValue = transferService.get().stream()
+                .filter(t -> number.equals(t.getInputNumber()))
+                .map(Transfer::getValue)
+                .reduce(BigInteger::add)
+                .orElse(BigInteger.ZERO);
+        BigInteger incomingValue = transferService.get().stream()
+                .filter(t -> number.equals(t.getOutputNumber()))
+                .map(Transfer::getValue)
+                .reduce(BigInteger::add)
+                .orElse(BigInteger.ZERO);
 
-        return new Balance(balanceValue, accountTransfers);
+        List<Transfer> accountTransfers = transferService.get().stream()
+                .filter(t -> number.equals(t.getInputNumber()) || number.equals(t.getOutputNumber()))
+                .collect(Collectors.toList());
+
+        return new Balance(incomingValue.subtract(outgoingValue), accountTransfers);
     }
 
     @POST
