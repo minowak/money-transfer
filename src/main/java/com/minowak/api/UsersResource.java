@@ -1,5 +1,6 @@
 package com.minowak.api;
 
+import com.minowak.ErrorResponse;
 import com.minowak.model.User;
 import com.minowak.service.UsersService;
 
@@ -10,7 +11,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
 
-// TODO sort, fields, target ?
 @ManagedBean
 @Path("/user")
 public class UsersResource {
@@ -40,7 +40,8 @@ public class UsersResource {
     public Response createUser(User user) {
         boolean created = usersService.add(user);
         return created ? Response.status(Response.Status.CREATED).build()
-                : Response.status(Response.Status.CONFLICT).build();
+                : new ErrorResponse(Response.Status.CONFLICT,
+                    String.format("User with id %d already exists", user.getId())).toResponse();
     }
 
     @PUT
@@ -60,7 +61,9 @@ public class UsersResource {
     @DELETE
     @Path("{id}")
     public Response deleteUser(@PathParam("id") Long id) {
-        return usersService.delete(id) ? Response.status(Response.Status.GONE).build() : Response.serverError().build();
+        return usersService.delete(id) ? Response.status(Response.Status.GONE).build()
+                : new ErrorResponse(Response.Status.CONFLICT,
+                    String.format("User with id %d does not exist", id)).toResponse();
     }
 
 }

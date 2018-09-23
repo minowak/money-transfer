@@ -10,6 +10,7 @@ import jersey.repackaged.com.google.common.collect.Sets;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.ws.rs.core.Response;
 import java.math.BigInteger;
 import java.util.Collection;
 
@@ -107,12 +108,48 @@ public class UsersAccountsResourceTest {
         transferService.add(transfer1);
         transferService.add(transfer2);
 
-        Balance balance1 = usersAccountsResource.calculateBalance(user1.getId(), account1.getNumber());
-        Balance balance2 = usersAccountsResource.calculateBalance(user2.getId(), account2.getNumber());
+        Balance balance1 = (Balance) usersAccountsResource.calculateBalance(user1.getId(), account1.getNumber()).getEntity();
+        Balance balance2 = (Balance) usersAccountsResource.calculateBalance(user2.getId(), account2.getNumber()).getEntity();
 
         // Then
         assertEquals(BigInteger.valueOf(90), balance1.getValue());
         assertEquals(BigInteger.valueOf(110), balance2.getValue());
+    }
+
+    @Test
+    public void shouldReturnErrorForBalanceForNonExistingUser() {
+        // Given
+        Account account1 = new Account("1234", Sets.newHashSet());
+        Account account2 = new Account("5678", Sets.newHashSet());
+        User user1 = new User(1L, "testName", "testSurname", Sets.newHashSet(account1));
+        User user2 = new User(2L, "testName", "testSurname", Sets.newHashSet(account2));
+        Transfer transfer0 = new Transfer(0L, null, account1.getNumber(), BigInteger.valueOf(200));
+        Transfer transfer1 = new Transfer(1L, account1.getNumber(), account2.getNumber(), BigInteger.valueOf(100));
+        Transfer transfer2 = new Transfer(2L, account1.getNumber(), account2.getNumber(), BigInteger.valueOf(10));
+
+        // When
+        usersService.add(user2);
+        transferService.add(transfer0);
+        transferService.add(transfer1);
+        transferService.add(transfer2);
+
+        Response response = usersAccountsResource.calculateBalance(user1.getId(), account1.getNumber());
+
+        // Then
+        assertEquals(Response.Status.CONFLICT.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void shouldReturnErrorForBalanceForNonExistingAccount() {
+        // Given
+        User user = new User(2L, "testName", "testSurname", Sets.newHashSet());
+
+        // When
+        usersService.add(user);
+        Response response = usersAccountsResource.calculateBalance(user.getId(), "5678");
+
+        // Then
+        assertEquals(Response.Status.CONFLICT.getStatusCode(), response.getStatus());
     }
 
 }

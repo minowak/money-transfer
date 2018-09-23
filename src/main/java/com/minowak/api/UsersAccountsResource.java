@@ -1,5 +1,6 @@
 package com.minowak.api;
 
+import com.minowak.ErrorResponse;
 import com.minowak.model.Account;
 import com.minowak.model.Balance;
 import com.minowak.model.Transfer;
@@ -50,7 +51,18 @@ public class UsersAccountsResource {
     @GET
     @Path("{id}/account/{number}/balance")
     @Produces(MediaType.APPLICATION_JSON)
-    public Balance calculateBalance(@PathParam("id") Long id, @PathParam("number") String number) {
+    public Response calculateBalance(@PathParam("id") Long id, @PathParam("number") String number) {
+        User user = usersService.get(id);
+        if (user == null) {
+            return new ErrorResponse(Response.Status.CONFLICT,
+                    String.format("User with id %d does not exist", id)).toResponse();
+        }
+        if (user.getAccounts().stream().map(Account::getNumber).noneMatch(n -> n.equals(number))) {
+            return new ErrorResponse(Response.Status.CONFLICT,
+                    String.format("User with id %d does not have account with number %s", id, number))
+                    .toResponse();
+        }
+
         BigInteger outgoingValue = transferService.get().stream()
                 .filter(t -> number.equals(t.getInputNumber()))
                 .map(Transfer::getValue)
@@ -66,7 +78,7 @@ public class UsersAccountsResource {
                 .filter(t -> number.equals(t.getInputNumber()) || number.equals(t.getOutputNumber()))
                 .collect(Collectors.toList());
 
-        return new Balance(incomingValue.subtract(outgoingValue), accountTransfers);
+        return Response.ok(new Balance(incomingValue.subtract(outgoingValue), accountTransfers)).build();
     }
 
     @POST
@@ -80,7 +92,8 @@ public class UsersAccountsResource {
         boolean updated = usersService.update(id, user.toBuilder().accounts(accounts).build());
         return updated
                 ? Response.status(Response.Status.CREATED).build()
-                : Response.status(Response.Status.CONFLICT).build();
+                : new ErrorResponse(Response.Status.CONFLICT,
+                    String.format("User with id %d does not exist", id)).toResponse();
     }
 
     @DELETE

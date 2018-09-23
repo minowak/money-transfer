@@ -6,7 +6,6 @@ import jersey.repackaged.com.google.common.collect.Sets;
 import javax.inject.Singleton;
 import java.util.*;
 
-// TODO https://stackoverflow.com/questions/16216759/dependency-injection-with-jersey-2-0
 @Singleton
 public final class UsersService implements PersistenceService<Long, User> {
     private Set<User> users = Collections.synchronizedSet(Sets.newHashSet());

@@ -1,5 +1,6 @@
 package com.minowak.api;
 
+import com.minowak.ErrorResponse;
 import com.minowak.model.Account;
 import com.minowak.model.Transfer;
 import com.minowak.model.User;
@@ -13,7 +14,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
 
-// TODO responses messages
 @ManagedBean
 @Path("/transfer")
 public class TransferResource {
@@ -39,16 +39,27 @@ public class TransferResource {
         return transferService.get(id);
     }
 
-    // TODO check if accounts exist
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addTransfer(Transfer transfer) {
-        boolean inputAccoutExist = transfer.getInputNumber() == null || accountExists(transfer.getInputNumber());
+        boolean inputAccountExist = transfer.getInputNumber() == null || accountExists(transfer.getInputNumber());
         boolean outputAccountExists = transfer.getOutputNumber() == null || accountExists(transfer.getOutputNumber());
 
+        if (!inputAccountExist) {
+            return new ErrorResponse(Response.Status.CONFLICT,
+                    String.format("Account %s does not exist", transfer.getInputNumber()))
+                    .toResponse();
+        }
+
+        if (!outputAccountExists) {
+            return new ErrorResponse(Response.Status.CONFLICT,
+                    String.format("Account %s does not exist", transfer.getOutputNumber()))
+                    .toResponse();
+        }
 
         return transferService.add(transfer) ? Response.status(Response.Status.CREATED).build()
-                : Response.status(Response.Status.CONFLICT).build();
+                : new ErrorResponse(Response.Status.CONFLICT,
+                String.format("Transfer with id %d already exists", transfer.getId())).toResponse();
     }
 
     private boolean accountExists(String number) {

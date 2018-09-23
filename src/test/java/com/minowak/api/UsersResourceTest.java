@@ -6,6 +6,7 @@ import jersey.repackaged.com.google.common.collect.Sets;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.ws.rs.core.Response;
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
@@ -65,6 +66,20 @@ public class UsersResourceTest {
     }
 
     @Test
+    public void shouldNotCreateSameUser() {
+        // Given
+        User user = new User(1L, "testName", "testSurname", Sets.newHashSet());
+
+        // When
+        usersResource.createUser(user);
+        Response response = usersResource.createUser(user);
+
+        // Then
+        assertEquals(user, usersService.get(user.getId()));
+        assertEquals(Response.Status.CONFLICT.getStatusCode(), response.getStatus());
+    }
+
+    @Test
     public void shouldUpdateUser() {
         // Given
         User user = new User(1L, "testName", "testSurname", Sets.newHashSet());
@@ -107,6 +122,22 @@ public class UsersResourceTest {
         // Then
         assertEquals(1, usersService.get().size());
         assertTrue(usersService.get().contains(user2));
+    }
+
+    @Test
+    public void shouldNotDeleteNonExistingUser() {
+        // Given
+        User user1 = new User(1L, "testName1", "testSurname1", Sets.newHashSet());
+        User user2 = new User(2L, "testName2", "testSurname2", Sets.newHashSet());
+
+        // When
+        usersService.add(user2);
+        Response response = usersResource.deleteUser(user1.getId());
+
+        // Then
+        assertEquals(1, usersService.get().size());
+        assertTrue(usersService.get().contains(user2));
+        assertEquals(Response.Status.CONFLICT.getStatusCode(), response.getStatus());
     }
 
 }
