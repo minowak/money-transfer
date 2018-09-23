@@ -2,8 +2,6 @@ package com.minowak.model;
 
 import lombok.*;
 
-import java.util.Set;
-
 @Getter
 @Setter
 @AllArgsConstructor
@@ -12,5 +10,4 @@ import java.util.Set;
 @Builder(toBuilder = true)
 public class Account {
     private String number;
-    private Set<Transfer> transfers;
 }

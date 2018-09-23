@@ -32,14 +32,13 @@ public class UsersAccountsResource {
     }
 
     @GET
-    @Path("{id}/account")
     @Produces(MediaType.APPLICATION_JSON)
     public Collection<Account> getAccounts(@PathParam("id") Long id) {
         return usersService.get(id).getAccounts();
     }
 
     @GET
-    @Path("{id}/account/{number}")
+    @Path("{number}")
     @Produces(MediaType.APPLICATION_JSON)
     public Account getAccount(@PathParam("id") Long id, @PathParam("number") String number) {
         return usersService.get(id).getAccounts().stream()
@@ -49,7 +48,7 @@ public class UsersAccountsResource {
     }
 
     @GET
-    @Path("{id}/account/{number}/balance")
+    @Path("{number}/balance")
     @Produces(MediaType.APPLICATION_JSON)
     public Response calculateBalance(@PathParam("id") Long id, @PathParam("number") String number) {
         User user = usersService.get(id);
@@ -82,7 +81,6 @@ public class UsersAccountsResource {
     }
 
     @POST
-    @Path("{id}/account")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createAccount(Account account, @PathParam("id") Long id) {
         User user = usersService.get(id);
@@ -97,7 +95,6 @@ public class UsersAccountsResource {
     }
 
     @DELETE
-    @Path("{id}/account")
     public Response deleteAccounts(@PathParam("id") Long id) {
         usersService.get(id).getAccounts().clear();
         return Response.status(Response.Status.GONE).build();

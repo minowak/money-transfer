@@ -62,8 +62,8 @@ public class TransferResourceTest {
     @Test
     public void shouldAddTransfer() {
         // Given
-        Account account1 = new Account("1234", Sets.newHashSet());
-        Account account2 = new Account("5678", Sets.newHashSet());
+        Account account1 = new Account("1234");
+        Account account2 = new Account("5678");
         User user = new User(1L, "testName", "testSurname", Sets.newHashSet(account1, account2));
         Transfer transfer = new Transfer(1L, account1.getNumber(), account2.getNumber(), BigInteger.valueOf(100));
 
@@ -79,7 +79,7 @@ public class TransferResourceTest {
     @Test
     public void shouldNotAddTransferForNonExistingInputAccount() {
         // Given
-        Account account = new Account("5678", Sets.newHashSet());
+        Account account = new Account("5678");
         User user = new User(1L, "testName", "testSurname", Sets.newHashSet(account));
         Transfer transfer = new Transfer(1L, "1234", account.getNumber(), BigInteger.valueOf(100));
 
@@ -94,7 +94,7 @@ public class TransferResourceTest {
     @Test
     public void shouldNotAddTransferForNonExistingOutputAccount() {
         // Given
-        Account account = new Account("1234", Sets.newHashSet());
+        Account account = new Account("1234");
         User user = new User(1L, "testName", "testSurname", Sets.newHashSet(account));
         Transfer transfer = new Transfer(1L, account.getNumber(), "5678", BigInteger.valueOf(100));
 
@@ -109,7 +109,7 @@ public class TransferResourceTest {
     @Test
     public void shouldAddDepositTransfer() {
         // Given
-        Account account = new Account("5678", Sets.newHashSet());
+        Account account = new Account("5678");
         User user = new User(1L, "testName", "testSurname", Sets.newHashSet(account));
         Transfer transfer = new Transfer(1L, null, account.getNumber(), BigInteger.valueOf(100));
 
@@ -125,7 +125,7 @@ public class TransferResourceTest {
     @Test
     public void shouldAddWithdrawalTransfer() {
         // Given
-        Account account = new Account("5678", Sets.newHashSet());
+        Account account = new Account("5678");
         User user = new User(1L, "testName", "testSurname", Sets.newHashSet(account));
         Transfer transfer = new Transfer(1L, account.getNumber(), null, BigInteger.valueOf(100));
 

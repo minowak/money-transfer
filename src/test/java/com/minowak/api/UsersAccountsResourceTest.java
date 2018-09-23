@@ -33,7 +33,7 @@ public class UsersAccountsResourceTest {
     @Test
     public void shouldGetAccounts() {
         // Given
-        Account account = new Account("1234", Sets.newHashSet());
+        Account account = new Account("1234");
         User user = new User(1L, "testName", "testSurname", Sets.newHashSet(account));
 
         // When
@@ -48,7 +48,7 @@ public class UsersAccountsResourceTest {
     @Test
     public void shouldGetAccount() {
         // Given
-        Account account = new Account("1234", Sets.newHashSet());
+        Account account = new Account("1234");
         User user = new User(1L, "testName", "testSurname", Sets.newHashSet(account));
 
         // When
@@ -62,7 +62,7 @@ public class UsersAccountsResourceTest {
     @Test
     public void shouldCreateAccount() {
         // Given
-        Account account = new Account("1234", Sets.newHashSet());
+        Account account = new Account("1234");
         User user = new User(1L, "testName", "testSurname", Sets.newHashSet());
 
         // When
@@ -78,7 +78,7 @@ public class UsersAccountsResourceTest {
     @Test
     public void shouldDeleteAccounts() {
         // Given
-        Account account = new Account("1234", Sets.newHashSet());
+        Account account = new Account("1234");
         User user = new User(1L, "testName", "testSurname", Sets.newHashSet(account));
 
         // When
@@ -93,8 +93,8 @@ public class UsersAccountsResourceTest {
     @Test
     public void shouldCalculateBalanceCorrectly() {
         // Given
-        Account account1 = new Account("1234", Sets.newHashSet());
-        Account account2 = new Account("5678", Sets.newHashSet());
+        Account account1 = new Account("1234");
+        Account account2 = new Account("5678");
         User user1 = new User(1L, "testName", "testSurname", Sets.newHashSet(account1));
         User user2 = new User(2L, "testName", "testSurname", Sets.newHashSet(account2));
         Transfer transfer0 = new Transfer(0L, null, account1.getNumber(), BigInteger.valueOf(200));
@@ -119,8 +119,8 @@ public class UsersAccountsResourceTest {
     @Test
     public void shouldReturnErrorForBalanceForNonExistingUser() {
         // Given
-        Account account1 = new Account("1234", Sets.newHashSet());
-        Account account2 = new Account("5678", Sets.newHashSet());
+        Account account1 = new Account("1234");
+        Account account2 = new Account("5678");
         User user1 = new User(1L, "testName", "testSurname", Sets.newHashSet(account1));
         User user2 = new User(2L, "testName", "testSurname", Sets.newHashSet(account2));
         Transfer transfer0 = new Transfer(0L, null, account1.getNumber(), BigInteger.valueOf(200));
