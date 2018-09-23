@@ -48,20 +48,24 @@ public class UsersResource {
     @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateUser(User user, @PathParam("id") Long id) {
-        usersService.update(id, user);
-        return Response.status(Response.Status.CREATED).build();
+        if(usersService.update(id, user)) {
+            return Response.status(Response.Status.CREATED).build();
+        } else {
+            return new ErrorResponse(Response.Status.CONFLICT,
+                    String.format("User with id %d doesn't exist", id)).toResponse();
+        }
     }
 
     @DELETE
     public Response deleteAllUsers() {
-        return usersService.delete() ? Response.status(Response.Status.GONE).build()
+        return usersService.delete() ? Response.status(Response.Status.OK).build()
                 : Response.serverError().build();
     }
 
     @DELETE
     @Path("{id}")
     public Response deleteUser(@PathParam("id") Long id) {
-        return usersService.delete(id) ? Response.status(Response.Status.GONE).build()
+        return usersService.delete(id) ? Response.status(Response.Status.OK).build()
                 : new ErrorResponse(Response.Status.CONFLICT,
                     String.format("User with id %d does not exist", id)).toResponse();
     }

@@ -31,6 +31,7 @@ public class UsersAccountsResourceTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void shouldGetAccounts() {
         // Given
         Account account = new Account("1234");
@@ -38,7 +39,7 @@ public class UsersAccountsResourceTest {
 
         // When
         usersService.add(user);
-        Collection<Account> accounts = usersAccountsResource.getAccounts(user.getId());
+        Collection<Account> accounts = (Collection<Account>) usersAccountsResource.getAccounts(user.getId()).getEntity();
 
         // Then
         assertEquals(1, accounts.size());
@@ -53,7 +54,7 @@ public class UsersAccountsResourceTest {
 
         // When
         usersService.add(user);
-        Account accountResponse = usersAccountsResource.getAccount(user.getId(), account.getNumber());
+        Account accountResponse = (Account) usersAccountsResource.getAccount(user.getId(), account.getNumber()).getEntity();
 
         // Then
         assertEquals(account, accountResponse);

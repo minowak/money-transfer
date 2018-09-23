@@ -14,7 +14,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.math.BigInteger;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,18 +32,30 @@ public class UsersAccountsResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<Account> getAccounts(@PathParam("id") Long id) {
-        return usersService.get(id).getAccounts();
+    public Response getAccounts(@PathParam("id") Long id) {
+        User user = usersService.get(id);
+        if (user != null) {
+            return Response.ok(usersService.get(id).getAccounts()).build();
+        } else {
+            return new ErrorResponse(Response.Status.CONFLICT,
+                    String.format("User with id %d doesn't exist", id)).toResponse();
+        }
     }
 
     @GET
     @Path("{number}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Account getAccount(@PathParam("id") Long id, @PathParam("number") String number) {
-        return usersService.get(id).getAccounts().stream()
-                .filter(a -> a.getNumber().equals(number))
-                .findFirst()
-                .orElse(null);
+    public Response getAccount(@PathParam("id") Long id, @PathParam("number") String number) {
+        User user = usersService.get(id);
+        if (user != null) {
+            return Response.ok(usersService.get(id).getAccounts().stream()
+                    .filter(a -> a.getNumber().equals(number))
+                    .findFirst()
+                    .orElse(null)).build();
+        } else {
+            return new ErrorResponse(Response.Status.CONFLICT,
+                    String.format("User with id %d doesn't exist", id)).toResponse();
+        }
     }
 
     @GET
@@ -83,6 +94,13 @@ public class UsersAccountsResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createAccount(Account account, @PathParam("id") Long id) {
+        for (User user : usersService.get()) {
+            if (user.getAccounts().contains(account)) {
+                return new ErrorResponse(Response.Status.CONFLICT,
+                        String.format("There is already an account with number %s", account.getNumber()))
+                        .toResponse();
+            }
+        }
         User user = usersService.get(id);
         Set<Account> accounts = user.getAccounts();
         accounts.add(account);
@@ -94,9 +112,36 @@ public class UsersAccountsResource {
                     String.format("User with id %d does not exist", id)).toResponse();
     }
 
+    // TODO test
+    @DELETE
+    @Path("{number}")
+    public Response deleteAccount(@PathParam("id") Long id, @PathParam("number") String number) {
+        User user = usersService.get(id);
+        if (user == null) {
+            return new ErrorResponse(Response.Status.CONFLICT,
+                    String.format("User with id %d doesn't exist", id)).toResponse();
+        }
+
+        User updatedUser = user.toBuilder().build();
+        for (Account account : usersService.get(id).getAccounts()) {
+            if (number.equals(account.getNumber())) {
+                updatedUser.getAccounts().remove(account);
+                if (usersService.update(user.getId(), updatedUser)) {
+                    return Response.status(Response.Status.OK).build();
+                } else {
+                    return new ErrorResponse(Response.Status.CONFLICT,
+                            String.format("User with id %d doesn't exist", id)).toResponse();
+                }
+            }
+        }
+        return new ErrorResponse(Response.Status.CONFLICT,
+                String.format("User with id %d does not have an account with number %s", id, number))
+                .toResponse();
+    }
+
     @DELETE
     public Response deleteAccounts(@PathParam("id") Long id) {
         usersService.get(id).getAccounts().clear();
-        return Response.status(Response.Status.GONE).build();
+        return Response.status(Response.Status.OK).build();
     }
 }
