@@ -112,7 +112,6 @@ public class UsersAccountsResource {
                     String.format("User with id %d does not exist", id)).toResponse();
     }
 
-    // TODO test
     @DELETE
     @Path("{number}")
     public Response deleteAccount(@PathParam("id") Long id, @PathParam("number") String number) {

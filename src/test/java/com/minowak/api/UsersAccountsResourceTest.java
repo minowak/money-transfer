@@ -77,6 +77,50 @@ public class UsersAccountsResourceTest {
     }
 
     @Test
+    public void shouldDeleteAccount() {
+        // Given
+        Account account = new Account("1234");
+        User user = new User(1L, "testName", "testSurname", Sets.newHashSet(account));
+
+        // When
+        usersService.add(user);
+        usersAccountsResource.deleteAccount(user.getId(), account.getNumber());
+
+        // Then
+        assertEquals(1, usersService.get().size());
+        assertEquals(0, usersService.get().iterator().next().getAccounts().size());
+    }
+
+    @Test
+    public void shouldReturnErrorWhenAccountDoesNotExist() {
+        // Given
+        Account account = new Account("1234");
+        User user = new User(1L, "testName", "testSurname", Sets.newHashSet(account));
+
+        // When
+        usersService.add(user);
+        Response response = usersAccountsResource.deleteAccount(user.getId(), "4567");
+
+        // Then
+        assertEquals(1, usersService.get().size());
+        assertEquals(Response.Status.CONFLICT.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void shouldReturnErrorWhenUserDoesNotExist() {
+        // Given
+        Account account = new Account("1234");
+        User user = new User(1L, "testName", "testSurname", Sets.newHashSet(account));
+
+        // When
+        Response response = usersAccountsResource.deleteAccount(user.getId(), account.getNumber());
+
+        // Then
+        assertEquals(0, usersService.get().size());
+        assertEquals(Response.Status.CONFLICT.getStatusCode(), response.getStatus());
+    }
+
+    @Test
     public void shouldDeleteAccounts() {
         // Given
         Account account = new Account("1234");

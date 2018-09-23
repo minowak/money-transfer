@@ -7,7 +7,6 @@ import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
-// TODO Readme
 public class ApplicationServer {
     private static final int DEFAULT_PORT = 8080;
 
